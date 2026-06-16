@@ -25,7 +25,7 @@ resource "aws_iam_user_policy" "low_priv_policy" {
         Resource = "*"
       },
       {
-        # SİBER GÜVENLİK AÇIĞI: Kullanıcı kendi yetkisini yükseltebilir
+        
         Sid      = "DangerousIAMPermission"
         Effect   = "Allow"
         Action   = [
