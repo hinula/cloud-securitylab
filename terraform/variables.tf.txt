@@ -1,0 +1,15 @@
+# =============================================================
+# Cloud Security Lab - Tanımlı Değişkenler
+# =============================================================
+
+variable "aws_region" {
+  description = "Simüle edilecek AWS bölgesi"
+  type        = string
+  default     = "us-east-1"
+}
+
+variable "lab_prefix" {
+  description = "Oluşturulacak kaynakların ön eki (prefix)"
+  type        = string
+  default     = "cloudsec"
+}
