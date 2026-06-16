@@ -31,7 +31,7 @@ resource "aws_s3_bucket_policy" "public_read" {
       Effect    = "Allow"
       Principal = "*"
       Action    = ["s3:GetObject", "s3:ListBucket"]
-      Resource  = [
+      Resource = [
         "${aws_s3_bucket.vulnerable_bucket.arn}",
         "${aws_s3_bucket.vulnerable_bucket.arn}/*"
       ]
@@ -39,16 +39,15 @@ resource "aws_s3_bucket_policy" "public_read" {
   })
 }
 
-
 resource "aws_s3_object" "fake_env" {
-  bucket  = aws_s3_bucket.vulnerable_bucket.id
-  key     = "config/.env"
+  bucket = aws_s3_bucket.vulnerable_bucket.id
+  key    = "config/.env"
   content = <<-EOT
     APP_ENV=production
     DB_HOST=internal-db.cloudsec.local
     DB_PASS=DUMMY_NOT_REAL_P@ssw0rd
 
-    
+    # HEDEF ANAHTARLAR - Kullanıcı bu bilgileri sızdırıp sisteme bağlanacak
     AWS_ACCESS_KEY_ID=AKIAIOSFODNN7LABTEST
     AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/LABTEST+KEY
     AWS_DEFAULT_REGION=us-east-1
@@ -56,8 +55,8 @@ resource "aws_s3_object" "fake_env" {
 }
 
 resource "aws_s3_object" "fake_config" {
-  bucket  = aws_s3_bucket.vulnerable_bucket.id
-  key     = "backup/app-config.json"
+  bucket = aws_s3_bucket.vulnerable_bucket.id
+  key    = "backup/app-config.json"
   content = jsonencode({
     environment = "staging"
     database = {
