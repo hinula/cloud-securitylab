@@ -39,7 +39,7 @@ resource "aws_s3_bucket_policy" "public_read" {
   })
 }
 
-# Kullanıcının bulup sızdırması gereken sahte (dummy) anahtar dosyaları
+
 resource "aws_s3_object" "fake_env" {
   bucket  = aws_s3_bucket.vulnerable_bucket.id
   key     = "config/.env"
@@ -48,7 +48,7 @@ resource "aws_s3_object" "fake_env" {
     DB_HOST=internal-db.cloudsec.local
     DB_PASS=DUMMY_NOT_REAL_P@ssw0rd
 
-    # HEDEF ANAHTARLAR - Kullanıcı bu bilgileri sızdırıp sisteme bağlanacak
+    
     AWS_ACCESS_KEY_ID=AKIAIOSFODNN7LABTEST
     AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/LABTEST+KEY
     AWS_DEFAULT_REGION=us-east-1
