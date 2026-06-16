@@ -1,0 +1,44 @@
+# =============================================================
+# Cloud Security Lab - Docker Orkestrasyon Altyapısı
+# =============================================================
+
+services:
+
+  # LocalStack: AWS API Simülasyon Katmanı
+  localstack:
+    image: localstack/localstack:latest
+    container_name: cloudsec-localstack
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=s3,iam,ec2,sts,lambda
+      - DEBUG=0
+      - DEFAULT_REGION=us-east-1
+    volumes:
+      - localstack_data:/var/lib/localstack
+      - /var/run/docker.sock:/var/run/docker.sock
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4566/_localstack/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Stage 3: Kullanıcının sızıp kaçacağı zafiyetli konteyner uygulaması
+  vulnerable-app:
+    image: nginx:alpine
+    container_name: cloudsec-vulnerable-app
+    privileged: true                    # CRITICAL VULNERABILITY
+    volumes:
+      - /:/host                         # CRITICAL VULNERABILITY: host root mount
+    ports:
+      - "8080:80"
+    depends_on:
+      localstack:
+        condition: service_healthy
+
+volumes:
+  localstack_data:
+
+networks:
+  default:
+    name: cloudsec-network
