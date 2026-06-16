@@ -25,10 +25,9 @@ resource "aws_iam_user_policy" "low_priv_policy" {
         Resource = "*"
       },
       {
-        
-        Sid      = "DangerousIAMPermission"
-        Effect   = "Allow"
-        Action   = [
+        Sid = "DangerousIAMPermission"
+        Effect = "Allow"
+        Action = [
           "iam:AttachUserPolicy",
           "iam:ListPolicies",
           "iam:GetPolicy"
