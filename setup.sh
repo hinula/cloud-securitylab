@@ -5,7 +5,7 @@
 
 set -e
 
-# Windows terminal aracı uyuşmazlıklarını otomatik onaran blok
+
 if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" ]]; then
   echo "[*] Windows ortam tespiti. Dosya biçimleri (LF) formatına dönüştürülüyor..."
   sed -i 's/\r$//' setup.sh
