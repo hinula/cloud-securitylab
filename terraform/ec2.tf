@@ -52,11 +52,11 @@ resource "aws_instance" "vulnerable_ec2" {
     service docker start
     usermod -aG docker ec2-user
 
-    # CTF Kurgusu için ana makinenin root dizinine flag yerleştirme
+    
     mkdir -p /root
     echo "FLAG{cl0ud_esc4p3_succ3ss}" > /root/flag.txt
 
-    # RISK: --privileged flagı ve host dizin eşlemesi izolasyonu tamamen kırar
+    
     docker run -d \
       --privileged \
       --name cloudsec-vulnerable-app \
