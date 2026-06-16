@@ -10,6 +10,7 @@ output "low_priv_user_name" {
   value = aws_iam_user.low_priv_user.name
 }
 
+
 output "lab_summary" {
   value = <<-EOT
     ╔══════════════════════════════════════════╗
