@@ -1,10 +1,10 @@
-# ☁️ Cloud Security Lab — HTB Style CTF
+# Cloud Security Lab
 
 > **Yerel AWS ortamında S3 sızıntısından başlayıp Docker konteyner kaçışına uzanan 3 aşamalı bir bulut güvenliği CTF laboratuvarı.**
 
 ---
 
-## 📋 İçindekiler
+## İçindekiler
 
 - [Senaryo ve Amaç](#senaryo-ve-amaç)
 - [Mimari](#mimari)
@@ -16,7 +16,7 @@
 
 ---
 
-## 🎯 Senaryo ve Amaç
+## Senaryo ve Amaç
 
 Bu laboratuvar, gerçek dünya bulut güvenliği açıklarını **tamamen yerel, izole bir ortamda** deneyimlemenizi sağlar. Hedef: üç aşamalı bir saldırı zincirini tamamlayarak host sistemdeki gizli bayrağı ele geçirmek.
 
@@ -27,7 +27,7 @@ S3 Misconfiguration → IAM Privilege Escalation → Container Escape → Root F
 
 ---
 
-## 🏗️ Mimari
+## Mimari
 
 ```
 ┌─────────────────────────────────────────────────┐
@@ -55,12 +55,12 @@ S3 Misconfiguration → IAM Privilege Escalation → Container Escape → Root F
 
 ---
 
-## 🚀 Kurulum
+## Kurulum
 
 ### Gereksinimler
 
 - [Docker](https://docs.docker.com/get-docker/) & Docker Compose
-- [Terraform](https://developer.hashicorp.com/terraform/install) >= 1.0
+- [Terraform](https://developer.hashicorp.com/terraform/install) 
 - [AWS CLI](https://aws.amazon.com/cli/)
 
 ### Tek Komutla Kur
@@ -80,7 +80,7 @@ Setup scripti şunları otomatik yapar:
 
 ---
 
-## 🎮 Aşamalar
+## Aşamalar
 
 ### Aşama 1 — S3 Yapılandırma Hatası
 
@@ -118,7 +118,7 @@ cat /host/root/flag.txt
 
 ---
 
-## 📁 Proje Yapısı
+## Proje Yapısı
 
 ```
 cloud-security-lab/
@@ -136,7 +136,7 @@ cloud-security-lab/
 
 ---
 
-## 🛠️ Kullanılan Teknolojiler
+## Kullanılan Teknolojiler
 
 | Bileşen | Teknoloji | Amaç |
 |---------|-----------|-------|
@@ -148,7 +148,7 @@ cloud-security-lab/
 
 ---
 
-## ⚠️ Güvenlik Uyarısı
+## Güvenlik Uyarısı
 
 Bu laboratuvar **yalnızca eğitim amaçlıdır.** Tüm "açıklar" kasıtlı olarak tasarlanmış olup yalnızca izole yerel ortamda çalışır.
 
