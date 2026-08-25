@@ -1,47 +1,72 @@
-# =============================================================
-# Cloud Security Lab - Docker Orkestrasyon Altyapısı
-# =============================================================
-
 services:
 
-  # LocalStack: AWS API Simülasyon Katmanı
   localstack:
     image: localstack/localstack:latest
     container_name: cloudsec-localstack
+
     ports:
       - "4566:4566"
+
     environment:
-      - SERVICES=s3,iam,ec2,sts,lambda
-      - DEBUG=0
-      - DEFAULT_REGION=us-east-1
+      SERVICES: s3,iam,sts
+      DEBUG: 0
+      AWS_DEFAULT_REGION: us-east-1
+      DEFAULT_REGION: us-east-1
+
     volumes:
       - localstack_data:/var/lib/localstack
-      - /var/run/docker.sock:/var/run/docker.sock
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:4566/_localstack/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
-  # Stage 3: Kullanıcının sızıp kaçacağı zafiyetli konteyner uygulaması
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -fs http://localhost:4566/_localstack/health || exit 1"
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+
   vulnerable-app:
     image: nginx:alpine
     container_name: cloudsec-vulnerable-app
-    privileged: true                    # CRITICAL VULNERABILITY
+
+    privileged: true
+
     volumes:
-      - /:/host                         # CRITICAL VULNERABILITY: host root mount
+      - lab_host:/host
+
     ports:
       - "8080:80"
-    # Burası sihirli dokunuş: Konteyner açılırken host sistemin root dizinine bayrağı bırakır
-    entrypoint: >
-      sh -c "mkdir -p /host/root && echo 'FLAG{cl0ud_esc4p3_succ3ss}' > /host/root/flag.txt && exec nginx -g 'daemon off;'"
+
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        mkdir -p /host/root
+        echo 'FLAG{cl0ud_esc4p3_succ3ss}' > /host/root/flag.txt
+        exec nginx -g 'daemon off;'
+
     depends_on:
       localstack:
         condition: service_healthy
 
+
+  ctf:
+    image: nginx:alpine
+    container_name: cloudsec-ctf
+
+    ports:
+      - "8090:80"
+
+    volumes:
+      - ./ctf:/usr/share/nginx/html:ro
+
+    depends_on:
+      - localstack
+      - vulnerable-app
+
+
 volumes:
   localstack_data:
-
-networks:
-  default:
-    name: cloudsec-network
+  lab_host:
